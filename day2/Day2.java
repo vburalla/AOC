@@ -42,8 +42,7 @@ public class Day2 {
         }
         
 
-        int result = getResult(elvePlay, selfPlay) * 3 + selfPlay.getPoints();
-        return result;
+        return getResult(elvePlay, selfPlay) * 3 + selfPlay.getPoints();
     }
 
     private static RPS getDefinedPlay(RPS play1, int resultToObtain) {
@@ -61,10 +60,8 @@ public class Day2 {
 
         List<String> guide = getInputData("day2/input1.txt");
 
-        List<Integer> results = guide.stream().map(play -> Day2.getResultPoints(play, 1)).collect(Collectors.toList());
-        System.out.println("Result part 1 is: " + results.stream().reduce(0, (a,b)-> (a+b)));
-        results = guide.stream().map(play -> Day2.getResultPoints(play, 2)).collect(Collectors.toList());
-        System.out.println("Result part 2 is: " + results.stream().reduce(0, (a,b)-> (a+b)));
+        System.out.println("Result part 1 is: " + guide.stream().map(play -> Day2.getResultPoints(play, 1)).mapToInt(Integer::valueOf).sum());
+        System.out.println("Result part 2 is: " + guide.stream().map(play -> Day2.getResultPoints(play, 2)).mapToInt(Integer::valueOf).sum());
 
 
     }
