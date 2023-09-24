@@ -19,6 +19,17 @@ public enum RPS {
         return this.points;
     }
 
+    public static RPS getByChoice(String choice) {
+
+        RPS element = RPS.A;
+        if(choice.equals(B.choice)){
+            element = RPS.B;
+        } else if(choice.equals(C.choice)){
+            element = RPS.C;
+        }
+        return element;
+    }
+
     public String getWeakOpposite() {
 
         String weakOpposite = "paper";
@@ -28,5 +39,16 @@ public enum RPS {
             weakOpposite = "rock";
         } 
         return weakOpposite;
+    }
+
+    public String getStrongOpposite() {
+
+        String strongOpposite = "rock";
+        if(this.choice.equals("rock")) {
+            strongOpposite = "paper";
+        } else if(this.choice.equals("paper")) {
+            strongOpposite = "scissors";
+        } 
+        return strongOpposite;
     }
 }
