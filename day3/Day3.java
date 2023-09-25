@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.io.IOException;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 class Day3 {
@@ -33,6 +32,46 @@ class Day3 {
         return repeatedList;
     }
 
+    private static List<String> getCommonItemsInSingleGroups(List<String> itemsGroup) {
+
+        String group1, group2, group3;
+        List<String> repeatedLetters = new ArrayList();
+        for(int i=0; i<itemsGroup.size(); i+=3) {
+            group1 = itemsGroup.get(i);
+            group2 = itemsGroup.get(i+1);
+            group3 = itemsGroup.get(i+2);
+
+            String repeated = getCommonItems(group1, group2);
+            repeated = getCommonItems(repeated, group3);
+            repeatedLetters.add(repeated);
+        }
+
+        return repeatedLetters;
+    }
+
+    private static Integer sumCharValuesInStringList(List<String> groups) {
+
+        var chars = getCommonItemsInSingleGroups(groups);
+        Integer total = 0; 
+        for(String ch : chars) {
+            total+= getCharValue(ch.charAt(0));
+        }
+        return total;
+    }
+
+    private static String getCommonItems(String a, String b) {
+        
+        String repeated ="";
+        int i = 0;
+        while(i < a.length()) {
+            
+            char ch = a.charAt(i);
+            if(b.indexOf(ch) >= 0) repeated+= ch;
+            i++;
+        }
+        return repeated;
+    }
+
     private static int getCommonItem(String a, String b) {
 
         int repeated = 0;
@@ -59,8 +98,8 @@ class Day3 {
     public static void main(String[] args) {
 
         List<Integer> repeatedItems = getCommonItems(getInputData("day3/input1.txt"));
-        System.out.println(repeatedItems);
-        System.out.println(repeatedItems.stream().mapToInt(Integer::valueOf).sum());
+        System.out.println("Part 1:" + repeatedItems.stream().mapToInt(Integer::valueOf).sum());
+        System.out.println("Part 2: " + sumCharValuesInStringList(getInputData("day3/input1.txt")));
     }
 }
 
