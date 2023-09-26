@@ -28,11 +28,12 @@ public class Day5 {
             formattedRows.add(formatRow(lines.remove(0)));
         }
         lines.remove(0);
-        for(int i=0; i<columns; i+=3) {
+        lines.remove(0);
+        for(int i=0; i<formattedRows.get(0).length(); i+=3) {
             LinkedList<String> newList = new LinkedList<>();
             for(String row : formattedRows) {
                 String value = row.substring(i,i+3).trim();
-                if(!value.equals("")) newList.addLast(value);
+                if(!value.equals("")) newList.addFirst(value);
             }
             queues.add(newList);
             i++;
@@ -45,9 +46,23 @@ public class Day5 {
 
         return row.replaceAll("[\\[\\]]"," ");
     }
+
+    private static List<String> executeInstructions(List<String> originalInstructions, List<LinkedList<String>> currentQueue) {
+
+        for(String instruction : originalInstructions) {
+            var decodedInstruction = decodeInstruction(instruction);
+        }
+        return null;
+    }
+
+    private static String[] decodeInstruction(String inst) {
+
+        return inst.split(" ");
+    }
     
     public static void main(String[] args) {
         var lines = getInputData("day5/input1.txt");
-        fillQueues(lines);
+        List<LinkedList<String>> queues = fillQueues(lines);
+        var instructions = executeInstructions(lines);
     }
 }
