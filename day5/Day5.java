@@ -47,22 +47,55 @@ public class Day5 {
         return row.replaceAll("[\\[\\]]"," ");
     }
 
-    private static List<String> executeInstructions(List<String> originalInstructions, List<LinkedList<String>> currentQueue) {
+    private static List<LinkedList<String>> executeInstructions(List<String> originalInstructions, List<LinkedList<String>> currentQueue, int model) {
 
         for(String instruction : originalInstructions) {
-            var decodedInstruction = decodeInstruction(instruction);
+            String[] decodedInstruction = decodeInstruction(instruction);
+            Integer quantity = Integer.valueOf(decodedInstruction[1]);
+            Integer origin = Integer.valueOf(decodedInstruction[3]);
+            Integer destination = Integer.valueOf(decodedInstruction[5]);
+            LinkedList<String> originColumn = currentQueue.get(origin-1);
+            LinkedList<String> destinationColumn = currentQueue.get(destination-1);
+            LinkedList<String> tempLinkedList = new LinkedList<>();
+            for(int i=0; i<quantity; i++) {
+                if(model==9000){
+                    destinationColumn.addLast(originColumn.removeLast());
+                } else {
+                    tempLinkedList.addFirst(originColumn.removeLast());
+                }
+            }
+            destinationColumn.addAll(tempLinkedList);
+            currentQueue.set(origin-1, originColumn);
+            currentQueue.set(destination-1, destinationColumn);
         }
-        return null;
+        return currentQueue;
     }
 
     private static String[] decodeInstruction(String inst) {
 
         return inst.split(" ");
     }
+
+    private static void printLast(List<LinkedList<String>> columns) {
+
+        for(LinkedList<String> column : columns) {
+            if(column.getLast()!=null) {
+                System.out.print("["+ column.getLast() + "]");
+            }
+        }
+        System.out.println();
+    }
     
     public static void main(String[] args) {
-        var lines = getInputData("day5/input1.txt");
+        List<String> lines = getInputData("day5/input1.txt");
         List<LinkedList<String>> queues = fillQueues(lines);
-        var instructions = executeInstructions(lines);
+        var result = executeInstructions(lines, queues,9000);
+        System.out.print("Part1: ");
+        printLast(result);
+        lines = getInputData("day5/input1.txt");
+        queues = fillQueues(lines);
+        result = executeInstructions(lines, queues,9001);
+        System.out.print("Part2: ");
+        printLast(result);
     }
 }
