@@ -18,75 +18,59 @@ class Day3 {
         return null;
     }
 
-    private static List<Integer> getCommonItems(List<String> itemsGroup) {
+    private static List<Character> getCommonItems(List<String> itemsGroup) {
         
         String group1, group2;
-        List<Integer> repeatedList = new ArrayList<>();
+        List<Character> repeatedList = new ArrayList<>();
 
         for(String items : itemsGroup) {
             group1 = items.substring(0, items.length()/2);
             group2 = items.substring(items.length()/2);
 
-            repeatedList.add(getCommonItem(group1, group2));
+            repeatedList.add(getCommonChars(group1, group2).get(0));
         }
         return repeatedList;
     }
 
-    private static List<String> getCommonItemsInSingleGroups(List<String> itemsGroup) {
+    private static List<Character> getCommonItemsInSingleGroups(List<String> itemsGroup) {
 
         String group1, group2, group3;
-        List<String> repeatedLetters = new ArrayList();
+        List<Character> repeatedLetters = new ArrayList();
         for(int i=0; i<itemsGroup.size(); i+=3) {
             group1 = itemsGroup.get(i);
             group2 = itemsGroup.get(i+1);
             group3 = itemsGroup.get(i+2);
 
-            String repeated = getCommonItems(group1, group2);
-            repeated = getCommonItems(repeated, group3);
-            repeatedLetters.add(repeated);
+            var repeated = getCommonChars("" + getCommonChars(group1, group2), group3);
+            repeatedLetters.add(repeated.get(0));
         }
 
         return repeatedLetters;
     }
 
-    private static Integer sumCharValuesInStringList(List<String> groups) {
+    private static Integer sumCharValuesInStringList(List<String> groups, int part) {
 
-        var chars = getCommonItemsInSingleGroups(groups);
+        var chars = part==1? getCommonItems(groups) : getCommonItemsInSingleGroups(groups);
         Integer total = 0; 
-        for(String ch : chars) {
-            total+= getCharValue(ch.charAt(0));
+        for(Character ch : chars) {
+            total+= getCharValue(ch);
         }
         return total;
     }
 
-    private static String getCommonItems(String a, String b) {
-        
-        String repeated ="";
+    private static List<Character> getCommonChars(String a, String b) {
+
+        List<Character> commonChars = new ArrayList<>();
+
         int i = 0;
         while(i < a.length()) {
             
             char ch = a.charAt(i);
-            if(b.indexOf(ch) >= 0) repeated+= ch;
+            if(b.indexOf(ch) >= 0) commonChars.add(ch);;
             i++;
         }
-        return repeated;
-    }
-
-    private static int getCommonItem(String a, String b) {
-
-        int repeated = 0;
-        boolean found = false;
-        int i = 0;
-        while(!found) {
-            if(a.indexOf(b.charAt(i)) >= 0 ) { 
-                found = true;
-                repeated = b.charAt(i);
-            }
-            else {
-                i++;
-            }
-        }
-        return getCharValue(repeated);
+        return commonChars;
+        
     }
 
     private static int getCharValue(int asciiPosition) {
@@ -97,9 +81,9 @@ class Day3 {
 
     public static void main(String[] args) {
 
-        List<Integer> repeatedItems = getCommonItems(getInputData("day3/input1.txt"));
-        System.out.println("Part 1:" + repeatedItems.stream().mapToInt(Integer::valueOf).sum());
-        System.out.println("Part 2: " + sumCharValuesInStringList(getInputData("day3/input1.txt")));
+        List<String> itemGroups = getInputData("day3/input1.txt");
+        System.out.println("Part 1:" + sumCharValuesInStringList(itemGroups, 1));
+        System.out.println("Part 2: " + sumCharValuesInStringList(itemGroups, 2));
     }
 }
 
