@@ -3,6 +3,7 @@ package day7;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ public class Day7 {
     private static final String LEVEL_UP = "..";
     private static final String CHANGE_DIR = "cd";
     private static final String LIST_DIR_CONTENT = "ls";
+    private static final int TOTAL_DISK_SPACE = 70000000;
 
     static Map<String, FileSystem> folders;
     static List<String> instructionList;
@@ -36,7 +38,21 @@ public class Day7 {
         folders = new HashMap<>();
         executeInstructions();
         System.out.println("Part 1: " + getFolderWithSizeUnder(100000));
+        System.out.println("Part 2: " + getFirstFolderWithSizeAbove(30000000 - (TOTAL_DISK_SPACE - getTotalUsedSpace())));
 
+    }
+
+    private static int getTotalUsedSpace() {
+
+        return folders.get("/").getSize();
+    }
+
+    private static int getFirstFolderWithSizeAbove(int minValue) {
+
+        List<Integer> sortedSizes = folders.keySet().stream().map(k -> folders.get(k).getSize()).filter(s -> s > minValue).collect(Collectors.toList());
+        Collections.sort(sortedSizes);
+        return sortedSizes.get(0);
+        
     }
 
     private static Integer getFolderWithSizeUnder(int maxSize) {
