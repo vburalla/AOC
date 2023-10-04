@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ReadFiles {
     
-    private static List<String> getInputData(String inputFile) {
+    public static List<String> getInputData(String inputFile) {
 
         try{
             return Files.readAllLines(Paths.get(inputFile));

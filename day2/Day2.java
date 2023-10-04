@@ -1,5 +1,6 @@
 package day2;
 
+import utils.ReadFiles;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -9,14 +10,6 @@ import java.util.stream.Collectors;
 public class Day2 {
     
     private static List<String> getInputData(String inputFile) {
-
-        try{
-            return Files.readAllLines(Paths.get(inputFile));
-        } catch (IOException ex) {
-            System.out.println("Exception" + ex.getLocalizedMessage());
-        }
-        return null;
-    }
 
     private static int getResult(RPS a, RPS b) {
 
@@ -58,7 +51,7 @@ public class Day2 {
 
     public static void main(String[] args) {
 
-        List<String> guide = getInputData("day2/input1.txt");
+        List<String> guide = ReadFiles.getInputData("day2/input1.txt");
 
         System.out.println("Result part 1 is: " + guide.stream().map(play -> Day2.getResultPoints(play, 1)).mapToInt(Integer::valueOf).sum());
         System.out.println("Result part 2 is: " + guide.stream().map(play -> Day2.getResultPoints(play, 2)).mapToInt(Integer::valueOf).sum());

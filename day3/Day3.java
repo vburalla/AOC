@@ -1,22 +1,10 @@
 package day3;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.ReadFiles;
 import java.util.List;
-import java.io.IOException;
 import java.util.ArrayList;
 
 class Day3 {
-
-    private static List<String> getInputData(String inputFile) {
-
-        try{
-            return Files.readAllLines(Paths.get(inputFile));
-        } catch (IOException ex) {
-            System.out.println("Exception" + ex.getLocalizedMessage());
-        }
-        return null;
-    }
 
     private static List<Character> getCommonItems(List<String> itemsGroup) {
         
@@ -81,7 +69,7 @@ class Day3 {
 
     public static void main(String[] args) {
 
-        List<String> itemGroups = getInputData("day3/input1.txt");
+        List<String> itemGroups = ReadFiles.getInputData("day3/input1.txt");
         System.out.println("Part 1:" + sumCharValuesInStringList(itemGroups, 1));
         System.out.println("Part 2: " + sumCharValuesInStringList(itemGroups, 2));
     }

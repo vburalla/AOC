@@ -1,21 +1,9 @@
 package day4;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.ReadFiles;
 import java.util.List;
-import java.io.IOException;
 
 class Day4 {
-
-    private static List<String> getInputData(String inputFile) {
-
-        try{
-            return Files.readAllLines(Paths.get(inputFile));
-        } catch (IOException ex) {
-            System.out.println("Exception" + ex.getLocalizedMessage());
-        }
-        return null;
-    }
 
     private static int analizeAssignmentPairs(List<String> assignments, boolean fullyContain) {
 
@@ -37,7 +25,7 @@ class Day4 {
     }
     
     public static void main(String[] args) {
-        List<String> sectionGroups = getInputData("day4/input1.txt");
+        List<String> sectionGroups = ReadFiles.getInputData("day4/input1.txt");
         System.out.println("Part 1: " + analizeAssignmentPairs(sectionGroups, false));
         System.out.println("Part 2: " + analizeAssignmentPairs(sectionGroups, true));
     }

@@ -1,23 +1,11 @@
 package day5;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.ReadFiles;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Day5 {
-    
-    private static List<String> getInputData(String inputFile) {
-
-        try{
-            return Files.readAllLines(Paths.get(inputFile));
-        } catch (IOException ex) {
-            System.out.println("Exception" + ex.getLocalizedMessage());
-        }
-        return null;
-    }
 
     private static List<LinkedList<String>> fillQueues(List<String> lines) {
 
@@ -87,12 +75,12 @@ public class Day5 {
     }
     
     public static void main(String[] args) {
-        List<String> lines = getInputData("day5/input1.txt");
+        List<String> lines = ReadFiles.getInputData("day5/input1.txt");
         List<LinkedList<String>> queues = fillQueues(lines);
         var result = executeInstructions(lines, queues,9000);
         System.out.print("Part1: ");
         printLast(result);
-        lines = getInputData("day5/input1.txt");
+        lines = ReadFiles.getInputData("day5/input1.txt");
         queues = fillQueues(lines);
         result = executeInstructions(lines, queues,9001);
         System.out.print("Part2: ");

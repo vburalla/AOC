@@ -1,14 +1,11 @@
 package day7;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import utils.ReadFiles;
 
 public class Day7 {
 
@@ -22,19 +19,9 @@ public class Day7 {
     static String currentPath ="";
     static int instructionNumber = 0;
 
-     private static List<String> getInputData(String inputFile) {
-
-        try{
-            return Files.readAllLines(Paths.get(inputFile));
-        } catch (IOException ex) {
-            System.out.println("Exception" + ex.getLocalizedMessage());
-        }
-        return null;
-    }
-
     public static void main(String[] args) {
 
-        instructionList = getInputData("day7/input1.txt");
+        instructionList = ReadFiles.getInputData("day7/input1.txt");
         folders = new HashMap<>();
         executeInstructions();
         System.out.println("Part 1: " + getFolderWithSizeUnder(100000));

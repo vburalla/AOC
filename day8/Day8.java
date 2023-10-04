@@ -1,24 +1,12 @@
 package day8;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import utils.ReadFiles;
 
 class Day8 {
 
     private static List<List<Integer>> treeMatrix;
-
-    private static List<String> getInputData(String inputFile) {
-
-        try{
-            return Files.readAllLines(Paths.get(inputFile));
-        } catch (IOException ex) {
-            System.out.println("Exception" + ex.getLocalizedMessage());
-        }
-        return null;
-    }
 
     private static List<List<Integer>> convertLinesToIntegerMatrix(List<String> lines) {
 
@@ -151,7 +139,7 @@ class Day8 {
 
     public static void main(String[] args) {
 
-        treeMatrix = convertLinesToIntegerMatrix(getInputData("day8/input1.txt"));
+        treeMatrix = convertLinesToIntegerMatrix(ReadFiles.getInputData("day8/input1.txt"));
        countVisibleTrees();
         
     }

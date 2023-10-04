@@ -1,22 +1,10 @@
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.ReadFiles;
 import java.util.List;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
 
 class Day1 {
-
-    private static List<String> getInputData(String inputFile) {
-
-        try{
-            return Files.readAllLines(Paths.get(inputFile));
-        } catch (IOException ex) {
-            System.out.println("Exception" + ex.getLocalizedMessage());
-        }
-        return null;
-    }
 
     private static List<Integer> getMaxCalories(List<String> calories) {
 
@@ -44,7 +32,7 @@ class Day1 {
 
     public static void main(String[] args) {
 
-        List<Integer> sortedElvesCalories = getMaxCalories(getInputData("day1/input1.txt"));
+        List<Integer> sortedElvesCalories = getMaxCalories(ReadFiles.getInputData("day1/input1.txt"));
 
         System.out.println("Solution part 1: " + sortedElvesCalories.get(sortedElvesCalories.size()-1));
         System.out.println("Solution part 2: " + sortedElvesCalories.subList(sortedElvesCalories.size()-3,sortedElvesCalories.size())
