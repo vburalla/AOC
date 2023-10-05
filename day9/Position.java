@@ -33,4 +33,8 @@ public class Position {
         return String.valueOf(x) + "," + String.valueOf(y);
     }
 
+    public Position getDistanceTo(Position nearPoint) {
+        return new Position(this.x - nearPoint.getX(), this.y - nearPoint.getY());
+    }
+
 }
