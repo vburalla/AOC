@@ -9,7 +9,6 @@ public class Day5 {
 
     private static List<LinkedList<String>> fillQueues(List<String> lines) {
 
-        int columns = (lines.get(0).length()+1)/4;
         List<LinkedList<String>> queues = new ArrayList<>();
         List<String> formattedRows = new ArrayList<>();
         while(!lines.get(1).equals("")) {

@@ -23,7 +23,7 @@ class Day3 {
     private static List<Character> getCommonItemsInSingleGroups(List<String> itemsGroup) {
 
         String group1, group2, group3;
-        List<Character> repeatedLetters = new ArrayList();
+        List<Character> repeatedLetters = new ArrayList<>();
         for(int i=0; i<itemsGroup.size(); i+=3) {
             group1 = itemsGroup.get(i);
             group2 = itemsGroup.get(i+1);

@@ -1,15 +1,9 @@
 package day2;
 
 import utils.ReadFiles;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.io.IOException;
-import java.util.stream.Collectors;
 
 public class Day2 {
-    
-    private static List<String> getInputData(String inputFile) {
 
     private static int getResult(RPS a, RPS b) {
 
