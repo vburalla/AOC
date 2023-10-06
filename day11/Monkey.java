@@ -20,6 +20,34 @@ public class Monkey {
         this.monkeyIfNotDivisible = monkeyIfFalse;
     }
 
+    public Monkey() {
+
+    }
+
+    public void setItems(LinkedList<Integer> items) {
+        this.items = items;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public void setOperationAmount(int amount) {
+        this.operationAmount = amount;
+    }
+
+    public void setTest(int test) {
+        this.divisionTest = test;
+    }
+
+    public void setMonkeyIfDivisible(int number) {
+        this.monkeyIfDivisible = number;
+    }
+
+    public void setMonkeyIfNotDivisible(int number) {
+        this.monkeyIfNotDivisible = number;
+    }
+
     public Item executeOperation() {
 
         int objective;
