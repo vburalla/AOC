@@ -1,3 +1,5 @@
+package day6;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -50,7 +52,7 @@ class Day6 {
 
     public static void main(String[] args) {
 
-        var datastreamBuffer = getInputData("day6/input1.txt");
+        var datastreamBuffer = getInputData("/day1/input1.txt");
         System.out.println("Part 1: " + findMarkerPosition(datastreamBuffer, 4));
         System.out.println("Part 2: " + findMarkerPosition(datastreamBuffer, 14));
 

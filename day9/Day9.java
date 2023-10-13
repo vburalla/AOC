@@ -1,3 +1,5 @@
+package day9;
+
 import utils.ReadFiles;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +21,7 @@ class Day9 {
 
     public static void main(String[] args) {
 
-        List<String> instructions = ReadFiles.getInputData("day9/input1.txt");
+        List<String> instructions = ReadFiles.getInputData("/day1/input1.txt");
         knotPositions = createFoldedRope(1);
         move(instructions, 1);
         System.out.println("Part 1: " + visitedPositions.size());

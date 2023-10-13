@@ -1,3 +1,5 @@
+package day1;
+
 import utils.ReadFiles;
 import java.util.List;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ class Day1 {
 
     public static void main(String[] args) {
 
-        List<Integer> sortedElvesCalories = getMaxCalories(ReadFiles.getInputData("day1/input1.txt"));
+        List<Integer> sortedElvesCalories = getMaxCalories(ReadFiles.getInputData("/day1/input1.txt"));
 
         System.out.println("Solution part 1: " + sortedElvesCalories.get(sortedElvesCalories.size()-1));
         System.out.println("Solution part 2: " + sortedElvesCalories.subList(sortedElvesCalories.size()-3,sortedElvesCalories.size())

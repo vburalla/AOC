@@ -12,6 +12,12 @@ public class Point {
         this.y = y;
     }
 
+    public Point(String coordinates) {
+        String[] coord = coordinates.split(", ");
+        this.x = Integer.parseInt(coord[0].replace("x=",""));
+        this.y = Integer.parseInt(coord[1].replace("y=", ""));
+    }
+
     public void setX(int x) {
         this.x = x;
     }

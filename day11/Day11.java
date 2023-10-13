@@ -23,7 +23,7 @@ public class Day11 {
         int id = 0;
         do {
             Monkey monkey = new Monkey(id);
-            while(monkeyInfo.size() > 0 && !(lineText = monkeyInfo.remove(0)).equals("")) {
+            while(!monkeyInfo.isEmpty() && !(lineText = monkeyInfo.remove(0)).equals("")) {
                 if(lineText.contains("Starting items:")) {
                     setMonkeyItems(lineText, monkey);
                 } else if(lineText.contains("Operation:")){
@@ -38,7 +38,7 @@ public class Day11 {
             }
             monkeys.add(monkey);
             id++;
-        } while (monkeyInfo.size()>0);
+        } while (!monkeyInfo.isEmpty());
         return monkeys.toArray(new Monkey[monkeys.size()]);
     }
 
