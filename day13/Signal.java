@@ -27,7 +27,11 @@ public class Signal implements Comparable<Signal> {
             if(elmnt1.contains("[") || elmnt2.contains("[") || elmnt1.contains(",") || elmnt2.contains(",")) {
                 result = compareSignals(elmnt1, elmnt2);
             } else {
-                if((result = checkEmptyOperators(elmnt1, elmnt2)) == 0) {
+                if(elmnt1.equals("") && elmnt2.equals("")) {
+                    result = 0;
+                } else if(elmnt1.equals("") || elmnt2.equals("")){
+                    result = elmnt1.equals("")? -1 : 1;
+                } else {
                     if (Integer.parseInt(elmnt1) < Integer.parseInt(elmnt2)) result = -1;
                     if (Integer.parseInt(elmnt1) > Integer.parseInt(elmnt2)) result = 1;
                 }
@@ -81,7 +85,11 @@ public class Signal implements Comparable<Signal> {
 
     private int checkEmptyOperators(String op1, String op2) {
         int result = 0;
-        if (op1.equals("") || op2.equals("")) result = op1.equals("")? -1 : 1;
+        if(op1.equals("") && op2.equals("")) {
+            result = 0;
+        } else {
+            if (op1.equals("") || op2.equals("")) result = op1.equals("")? -1 : 1;
+        }
         return result;
     }
 }

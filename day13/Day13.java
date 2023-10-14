@@ -10,8 +10,8 @@ public class Day13 {
 
     public static void main(String[] args) {
 
-        var signalLines = ReadFiles.getInputData("day13/test.txt");
-        //part1(signalLines);
+        var signalLines = ReadFiles.getInputData("day13/input1.txt");
+        part1(signalLines);
         part2(signalLines);
     }
 
@@ -29,25 +29,28 @@ public class Day13 {
             if(signal1.compareTo(signal2) < 0) {
                 rightOrder++;
                 rightPairsSum+=pairs;
-                text = "is in RIGHT order";
-            } else {
-                text = "is NOT in the RIGHT order";
             }
-            System.out.println(String.format("#%s Comparing %s and %s : result %s", pairs,signal1.packet, signal2.packet, text));
         }
         System.out.println(String.format("Part 1: There are %s pairs in the right order, and SUM = %s", rightOrder,rightPairsSum));
     }
 
     private static void part2(List<String> lines) {
-
+        String divider1 = "[[2]]";
+        String divider2 = "[[6]]";
         lines = lines.stream().filter(line -> !line.equals("")).collect(Collectors.toList());
-        lines.add("[[2]]");
-        lines.add("[[6]]");
+        lines.add(divider1);
+        lines.add(divider2);
         List<Signal> signals = lines.stream().map(Signal::new).collect(Collectors.toList());
         Collections.sort(signals);
+        int result = 1;
+        int index = 1;
         for(Signal signal : signals) {
-            System.out.println(signal.packet);
+            if(signal.packet.equals(divider1) || signal.packet.equals(divider2)) {
+                result*=index;
+            }
+            index++;
         }
+        System.out.println(String.format("Part 2: decoder key = %s",result));
     }
 
 }
