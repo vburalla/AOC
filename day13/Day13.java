@@ -1,66 +1,53 @@
-import java.util.*;
+package day13;
+
+import utils.ReadFiles;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Day13 {
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        List<String> packets = new ArrayList<>();
 
-        // Read input packets until there is no more input
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (!line.isEmpty()) {
-                packets.add(line);
-            }
-        }
-
-        // Sort the packets based on the custom comparison logic
-        packets.sort((a, b) -> comparePackets(a, b));
-
-        // Find the indices of divider packets
-        int dividerIndex1 = packets.indexOf("[[2]]");
-        int dividerIndex2 = packets.indexOf("[[6]]");
-
-        // Calculate the decoder key
-        long decoderKey = (dividerIndex1 + 1L) * (dividerIndex2 + 1L);
-
-        System.out.println("Decoder Key: " + decoderKey);
+        var signalLines = ReadFiles.getInputData("day13/test.txt");
+        //part1(signalLines);
+        part2(signalLines);
     }
 
-    // Custom comparison function for sorting packets
-    private static int comparePackets(String packet1, String packet2) {
-        String[] parts1 = packet1.split(",");
-        String[] parts2 = packet2.split(",");
-        int i = 0;
-        int j = 0;
-
-        while (i < parts1.length && j < parts2.length) {
-            String token1 = parts1[i];
-            String token2 = parts2[j];
-            int compareResult = compareTokens(token1, token2);
-
-            if (compareResult != 0) {
-                return compareResult;
-            }
-
+    private static void part1(List<String> lines) {
+        int i=0;
+        int pairs = 0;
+        int rightOrder = 0;
+        int rightPairsSum = 0;
+        String text = "";
+        while(i <lines.size()){
+            Signal signal1 = new Signal(lines.get(i++));
+            Signal signal2 = new Signal(lines.get(i++));
             i++;
-            j++;
+            pairs++;
+            if(signal1.compareTo(signal2) < 0) {
+                rightOrder++;
+                rightPairsSum+=pairs;
+                text = "is in RIGHT order";
+            } else {
+                text = "is NOT in the RIGHT order";
+            }
+            System.out.println(String.format("#%s Comparing %s and %s : result %s", pairs,signal1.packet, signal2.packet, text));
         }
-
-        return Integer.compare(parts1.length, parts2.length);
+        System.out.println(String.format("Part 1: There are %s pairs in the right order, and SUM = %s", rightOrder,rightPairsSum));
     }
 
-    // Compare two tokens within a packet
-    private static int compareTokens(String token1, String token2) {
-        if (token1.equals(token2)) {
-            return 0;
-        }
+    private static void part2(List<String> lines) {
 
-        if (token1.startsWith("[") && token2.startsWith("[")) {
-            return comparePackets(token1, token2);
-        } else if (token1.startsWith("[") || token2.startsWith("[")) {
-            return compareTokens(token1.replace("[", "").replace("]", ""), token2.replace("[", "").replace("]", ""));
-        } else {
-            return Integer.compare(Integer.parseInt(token1), Integer.parseInt(token2));
+        lines = lines.stream().filter(line -> !line.equals("")).collect(Collectors.toList());
+        lines.add("[[2]]");
+        lines.add("[[6]]");
+        List<Signal> signals = lines.stream().map(Signal::new).collect(Collectors.toList());
+        Collections.sort(signals);
+        for(Signal signal : signals) {
+            System.out.println(signal.packet);
         }
     }
+
 }
