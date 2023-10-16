@@ -11,8 +11,9 @@ public class Day15 {
 
     public static void main(String[] args) {
 
-        var sensors = getSensortsAndBeacons(ReadFiles.getInputData("day15/input1.txt"));
-        System.out.println("Part 1: " + calculatePossiblePoints(2000000, sensors));
+        var sensors = getSensortsAndBeacons(ReadFiles.getInputData("day15/test.txt"));
+        System.out.println("Part 1: " + calculatePossiblePoints(10, sensors));
+        findBeaconPositionInRestrictedRange(sensors, 0, 20);
     }
 
     public static int calculatePossiblePoints(int line, List<Sensor> sensorList) {
@@ -41,11 +42,6 @@ public class Day15 {
         return points;
     }
 
-    /**private static int getManhattanDistance(Point point1, Point point2) {
-
-        return Math.abs(point1.getX() - point2.getX()) + Math.abs(point1.getY() - point2.getY());
-    }*/
-
     private static List<Sensor> getSensortsAndBeacons(List<String> info) {
 
         var sensorsAndBeacons = new ArrayList<Sensor>();
@@ -65,31 +61,41 @@ public class Day15 {
 
     private static void findBeaconPositionInRestrictedRange(List<Sensor> sensors, int restrictionMin, int restrictionMax) {
 
-        List<List<Range>> coveredRanges = new ArrayList<>(restrictionMax-restrictionMin);
+        List<List<Range>> coveredRanges = new ArrayList<>(Collections.nCopies(restrictionMax-restrictionMin + 1, null));
         for(Sensor sensor : sensors) {
             int manhattan = sensor.getManhattan();
             int sensorRow = sensor.getUbicationY();
             int initialRow = ((sensorRow - manhattan) >= restrictionMin)? (sensorRow - manhattan) : restrictionMin;
             int finalRow = ((sensorRow + manhattan) <= restrictionMax)? (sensorRow + manhattan) : restrictionMax;
-            for(int row = 0; (row <= manhattan) && ((row + manhattan) < restrictionMax); row++) {
+            for(int row = initialRow; row <= finalRow; row++) {
 
-                List<Range> lineRanges = coveredRanges.get(row + sensorRow);
-                if(!lineRanges.isEmpty()) {
-                    lineRanges.add(sensor.getRangeAtRow(row + sensorRow));
+                List<Range> lineRanges = coveredRanges.get(row);
+                if(lineRanges == null) {
+                    Range range = sensor.getRangeAtRow(row);
+                    if(range.leftLimit < restrictionMin) range.leftLimit = restrictionMin;
+                    if(range.rightLimit > restrictionMax) range.rightLimit = restrictionMax;
+                    if(range != null) lineRanges = (Arrays.asList(range));
                 } else {
-                    lineRanges.set(row, sensor.getRangeAtRow(row + sensorRow));
+                    lineRanges = updateRangesInRow(lineRanges, sensor.getRangeAtRow(row), restrictionMin, restrictionMax);
                 }
-                if((row - manhattan) >= restrictionMin) {
-                    lineRanges = coveredRanges.get(sensorRow - row);
-                    if(!lineRanges.isEmpty()) {
-                        lineRanges.add(sensor.getRangeAtRow(sensorRow - row));
-                    } else {
-                        lineRanges.set(row, sensor.getRangeAtRow(sensorRow - row));
-                    } 
-                }
+                coveredRanges.set(row, lineRanges);
             }
-            
         }
+        System.out.println(coveredRanges.get(10));
+    }
+
+    private static List<Range> updateRangesInRow(List<Range> currentRanges, Range newRange, int minRange, int maxRange) {
+
+        List<Range> finalRanges = new ArrayList<>();
+        for(Range range : currentRanges) {
+            if(newRange.isIntersected(range)) {
+                newRange.mergeIntersected(newRange, minRange, maxRange);
+            } else {
+                finalRanges.add(range);
+            }
+        }
+        finalRanges.add(newRange);
+        return finalRanges;
     }
 
     

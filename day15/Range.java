@@ -10,12 +10,20 @@ class Range {
         this.rightLimit = rightLimit;
     }
 
-    public isIntersected(Range range) {
-
-        return !(this.rightLimit < range.leftLimit) || (this.leftLimit > range.rightLimit);
+    public int getLeftLimit() {
+        return leftLimit;
     }
 
-    public mergeIntersected(Range range, Integer leftRestriction, Integer rightRestriction) {
+    public int getRightLimit() {
+        return rightLimit;
+    }
+
+    public boolean isIntersected(Range range) {
+
+        return !((this.rightLimit < range.leftLimit) || (this.leftLimit > range.rightLimit));
+    }
+
+    public void mergeIntersected(Range range, Integer leftRestriction, Integer rightRestriction) {
 
         int left = Math.min(this.leftLimit, range.leftLimit);
         int right = Math.max(this.rightLimit, range.rightLimit);
@@ -24,7 +32,7 @@ class Range {
         this.rightLimit = (rightRestriction != null && right > rightRestriction)? rightRestriction : right;
     }
 
-    public mergeIntersected(Range range) {
+    public void mergeIntersected(Range range) {
 
         int left = Math.min(this.leftLimit, range.leftLimit);
         int right = Math.max(this.rightLimit, range.rightLimit);
