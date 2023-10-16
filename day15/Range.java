@@ -20,7 +20,7 @@ class Range {
 
     public boolean isIntersected(Range range) {
 
-        return !((this.rightLimit < range.leftLimit) || (this.leftLimit > range.rightLimit));
+        return !((this.rightLimit < range.leftLimit -1) || (this.leftLimit > range.rightLimit +1));
     }
 
     public void mergeIntersected(Range range, Integer leftRestriction, Integer rightRestriction) {

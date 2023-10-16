@@ -9,11 +9,15 @@ import java.util.regex.Pattern;
 
 public class Day15 {
 
+    private static final int PART1_OBJECTIVE_ROW = 2000000;
+    private static final int PART2_LEFT_BOUNDARY = 0;
+    private static final int PART2_RIGHT_BOUNDARY = 4000000;
+
     public static void main(String[] args) {
 
-        var sensors = getSensortsAndBeacons(ReadFiles.getInputData("day15/test.txt"));
-        System.out.println("Part 1: " + calculatePossiblePoints(10, sensors));
-        findBeaconPositionInRestrictedRange(sensors, 0, 20);
+        var sensors = getSensortsAndBeacons(ReadFiles.getInputData("day15/input1.txt"));
+        System.out.println("Part 1: " + calculatePossiblePoints(PART1_OBJECTIVE_ROW, sensors));
+        findBeaconPositionInRestrictedRange(sensors, PART2_LEFT_BOUNDARY, PART2_RIGHT_BOUNDARY);
     }
 
     public static int calculatePossiblePoints(int line, List<Sensor> sensorList) {
@@ -81,7 +85,19 @@ public class Day15 {
                 coveredRanges.set(row, lineRanges);
             }
         }
-        System.out.println(coveredRanges.get(10));
+        long rowNumber = 0;
+        long columnNumber = 0;
+        long tunningFrequency = 0;
+        for(int i=0; i< coveredRanges.size(); i++) {
+            if(coveredRanges.get(i).size() > 1) {
+                rowNumber = i;
+                List<Range> ranges = coveredRanges.get(i);
+                columnNumber = (ranges.get(0).getRightLimit() < ranges.get(1).getRightLimit())? ranges.get(0).getRightLimit()+1 : ranges.get(1).getRightLimit()+1;
+                tunningFrequency = PART2_RIGHT_BOUNDARY * columnNumber + rowNumber;
+                break;
+            }
+        }
+        System.out.println(String.format("Part 2: Point x=%s, y=%s. Tunning frequency = %s",columnNumber, rowNumber, tunningFrequency));
     }
 
     private static List<Range> updateRangesInRow(List<Range> currentRanges, Range newRange, int minRange, int maxRange) {
@@ -89,7 +105,7 @@ public class Day15 {
         List<Range> finalRanges = new ArrayList<>();
         for(Range range : currentRanges) {
             if(newRange.isIntersected(range)) {
-                newRange.mergeIntersected(newRange, minRange, maxRange);
+                newRange.mergeIntersected(range, minRange, maxRange);
             } else {
                 finalRanges.add(range);
             }
