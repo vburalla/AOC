@@ -20,7 +20,7 @@ public class Day13 {
         int pairs = 0;
         int rightOrder = 0;
         int rightPairsSum = 0;
-        String text = "";
+
         while(i <lines.size()){
             Signal signal1 = new Signal(lines.get(i++));
             Signal signal2 = new Signal(lines.get(i++));

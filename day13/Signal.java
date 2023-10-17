@@ -82,14 +82,4 @@ public class Signal implements Comparable<Signal> {
         }
         return elements;
     }
-
-    private int checkEmptyOperators(String op1, String op2) {
-        int result = 0;
-        if(op1.equals("") && op2.equals("")) {
-            result = 0;
-        } else {
-            if (op1.equals("") || op2.equals("")) result = op1.equals("")? -1 : 1;
-        }
-        return result;
-    }
 }

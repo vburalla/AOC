@@ -1,4 +1,4 @@
-package Day14;
+package day14;
 
 import utils.Point;
 import utils.ReadFiles;
@@ -83,18 +83,5 @@ public class Day14 {
     private static boolean canMoveDownRight(Point cPoint) {
 
         return cave[cPoint.getX()+1][cPoint.getY()+1] == '·' ;
-    }
-
-    private static void printCave() {
-
-        for(int i=0; i< cave.length; i++) {
-            System.out.println(new String(cave[i]).substring(400, 600));
-        }
-        try {
-            Thread.sleep(300);
-        } catch (Exception ex) {
-            System.out.println("error");
-        }
-        System.out.println();
     }
 }

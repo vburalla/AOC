@@ -1,4 +1,4 @@
-package Day14;
+package day14;
 
 import utils.Point;
 
