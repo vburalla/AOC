@@ -5,20 +5,17 @@ import java.util.List;
 
 public class Path {
     
-    String destination;
-    int steps;
+    int cost;
     List<String> path;
 
-    public Path(String destination, int steps, List<String> path) {
+    public Path(int cost, List<String> path) {
 
-        this.steps = steps;
-        this.destination = destination;
+        this.cost = cost;
         this.path = path;
     }
 
     public Path(String destination) {
-        this.steps = 0;
-        this.destination = destination;
+        this.cost = 0;
         this.path = new ArrayList<>();
     }
 }
