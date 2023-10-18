@@ -2,21 +2,18 @@ package day16;
 
 import utils.ReadFiles;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
-import java.util.Map;
-import java.util.Set;
 
 public class Day16 {
     
     public static void main(String[] args) {
 
         var valvesMap = getValvesInfo(ReadFiles.getInputData("day16/test.txt"));
+        createPathMap(valvesMap);
         System.out.println();
     }
 
@@ -44,21 +41,56 @@ public class Day16 {
 
     private static Map<String, List<String>> createPathMap(Map<String, Valve> valves) {
 
-        for(String valveId : valves.keySet()) {
-
+        Map<String, List<String>> bestPaths = new HashMap<>();
+        for(String valveOrigin : valves.keySet()) {
+            for(String valveDestination : valves.keySet()) {
+                if(!valveDestination.equals(valveOrigin)) {
+                    if(!bestPaths.containsKey(valveOrigin + "-" + valveDestination)) {
+                        var best = findBestPath(valveOrigin, valveDestination, valves).get(0).path;
+                        bestPaths.put(valveOrigin + "-" + valveDestination, best);
+                        if(!bestPaths.containsKey(valveDestination + "-" + valveOrigin)) {
+                            List<String> reversedBest = new ArrayList<>(best);
+                            Collections.reverse(reversedBest);
+                            bestPaths.put(valveDestination + "-" + valveOrigin, reversedBest);
+                        }
+                    }
+                }
+            }
         }
+        return bestPaths;
     }
 
-    private static List<String> findBestPath(String origin, Map<String, Valve> valves) {
+    private static List<Path> findBestPath(String origin, String destination, Map<String, Valve> valves) {
 
         var valvesSet = valves.keySet();
-        valvesSet.remove(origin);
-        String path = origin;
-        List<String> nodeNeighbours = valves.get(origin).neighbours;
-        for(String neighbour : nodeNeighbours) {
-            List<String> newNodeNeighbours = new ArrayList<>();
+        //valvesSet.remove(origin);
+        List<Path> paths = new ArrayList<>();
+        paths.add(new Path(origin,0, Arrays.asList(origin)));
+        boolean reached = false;
+        while(!reached) {
+            List<Path> newPaths = new ArrayList<>();
+            while (!paths.isEmpty()) {
+                var path = paths.remove(0);
+                List<String> nodeNeighbours = valves.get(path.currentNode).neighbours;
+                for (String neighbour : nodeNeighbours) {
+                    if (!path.path.contains(neighbour)) {
+                        Path newPath = new Path(neighbour, path);
+                        if (neighbour.equals(destination)) {
+                            reached = true;
+                            newPath.reach();
+                        }
+                        newPaths.add(newPath);
+                    }
+                }
+            }
+            if(!reached) {
+                paths.addAll(newPaths);
+            } else {
+                paths = newPaths.stream().filter(Path::isReached).collect(Collectors.toList());
+                Collections.sort(paths);
+            }
         }
-        
 
+        return paths;
     }
 }
