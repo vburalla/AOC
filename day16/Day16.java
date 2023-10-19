@@ -13,7 +13,7 @@ public class Day16 {
     public static void main(String[] args) {
 
         var valvesMap = getValvesInfo(ReadFiles.getInputData("day16/test.txt"));
-        //createPathMap(valvesMap);
+        moveReleasingPressure(valvesMap);
         System.out.println();
     }
 
@@ -22,6 +22,28 @@ public class Day16 {
         Map<String, Valve> valvesMap = infoLines.stream().map(Day16::createValveFromTextLine).collect(Collectors.toMap(Valve::getName,Function.identity()));
         
         return valvesMap;
+    }
+
+    private static void moveReleasingPressure(Map<String, Valve> valves) {
+
+        int minutes = 30;
+        String currentValve = "AA";
+        while(minutes > 0) {
+            var valvePaths = createPathMap(currentValve, valves);
+            var bestValvePath = valvePaths.get(0);
+            List<String> destinationPath = bestValvePath.path;
+            destinationPath.remove(0);
+            for(String valve : destinationPath) {
+                releasePressure(valves);
+                if(valve.equals(bestValvePath.currentNode)){
+                    valves.get(valve).openValve();
+                    currentValve = valve;
+                    break;
+                }
+                minutes--;
+                System.out.println(String.format("Remaining %s", minutes));
+            }
+        }
     }
 
     private static Valve createValveFromTextLine(String valveData) {
@@ -39,24 +61,23 @@ public class Day16 {
         return valve;
     }
 
-    private static Map<String, List<String>> createPathMap(String originValve, Map<String, Valve> valves) {
+    private static List<Path> createPathMap(String originValve, Map<String, Valve> valves) {
 
-        Map<String, List<String>> bestPaths = new HashMap<>();
+        //Map<String, List<String>> bestPaths = new HashMap<>();
+        List<Path> bPaths = new ArrayList();
         
         for(String valveDestination : valves.keySet()) {
-            if(!valveDestination.equals(originValve)) {
-                if(!bestPaths.containsKey(originValve + "-" + valveDestination)) {
-                    var best = findBestPath(originValve, valveDestination, valves).get(0).path;
-                    bestPaths.put(originValve + "-" + valveDestination, best);
-                    if(!bestPaths.containsKey(valveDestination + "-" + originValve)) {
-                        List<String> reversedBest = new ArrayList<>(best);
-                        Collections.reverse(reversedBest);
-                        bestPaths.put(valveDestination + "-" + originValve, reversedBest);
-                    }
-                }
+            if(!valveDestination.equals(originValve) && !valves.get(valveDestination).open) {
+                //if(!bestPaths.containsKey(originValve + "-" + valveDestination)) {
+                    //var best = findBestPath(originValve, valveDestination, valves).get(0).path;
+                    var bPath = findBestPath(originValve, valveDestination, valves).get(0);
+                    //bestPaths.put(originValve + "-" + valveDestination, best);
+                    bPaths.add(bPath);
+                //}
             }
         }
-        return bestPaths;
+        Collections.sort(bPaths);
+        return bPaths;
     }
 
     private static void releasePressure(Map<String, Valve> valves) {
@@ -81,7 +102,7 @@ public class Day16 {
                         Path newPath = new Path(neighbour, path);
                         if (neighbour.equals(destination)) {
                             reached = true;
-                            newPath.reach();
+                            newPath.reach(valves.get(destination).flowRate);
                         }
                         newPaths.add(newPath);
                     }
