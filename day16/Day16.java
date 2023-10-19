@@ -13,18 +13,18 @@ public class Day16 {
     public static void main(String[] args) {
 
         var valvesMap = getValvesInfo(ReadFiles.getInputData("day16/test.txt"));
-        createPathMap(valvesMap);
+        //createPathMap(valvesMap);
         System.out.println();
     }
 
     private static Map<String, Valve> getValvesInfo(List<String> infoLines) {
 
-        Map<String, Valve> valvesMap = infoLines.stream().map(Day16::createValveFromLine).collect(Collectors.toMap(Valve::getName,Function.identity()));
+        Map<String, Valve> valvesMap = infoLines.stream().map(Day16::createValveFromTextLine).collect(Collectors.toMap(Valve::getName,Function.identity()));
         
         return valvesMap;
     }
 
-    private static Valve createValveFromLine(String valveData) {
+    private static Valve createValveFromTextLine(String valveData) {
 
         Pattern pattern = Pattern.compile("Valve ([A-Z]{2}) has flow rate=(\\d+); tunnels? leads? to valves? ([[A-Z]{2},?\\s?]+)");
         Matcher m = pattern.matcher(valveData);
@@ -39,20 +39,19 @@ public class Day16 {
         return valve;
     }
 
-    private static Map<String, List<String>> createPathMap(Map<String, Valve> valves) {
+    private static Map<String, List<String>> createPathMap(String originValve, Map<String, Valve> valves) {
 
         Map<String, List<String>> bestPaths = new HashMap<>();
-        for(String valveOrigin : valves.keySet()) {
-            for(String valveDestination : valves.keySet()) {
-                if(!valveDestination.equals(valveOrigin)) {
-                    if(!bestPaths.containsKey(valveOrigin + "-" + valveDestination)) {
-                        var best = findBestPath(valveOrigin, valveDestination, valves).get(0).path;
-                        bestPaths.put(valveOrigin + "-" + valveDestination, best);
-                        if(!bestPaths.containsKey(valveDestination + "-" + valveOrigin)) {
-                            List<String> reversedBest = new ArrayList<>(best);
-                            Collections.reverse(reversedBest);
-                            bestPaths.put(valveDestination + "-" + valveOrigin, reversedBest);
-                        }
+        
+        for(String valveDestination : valves.keySet()) {
+            if(!valveDestination.equals(originValve)) {
+                if(!bestPaths.containsKey(originValve + "-" + valveDestination)) {
+                    var best = findBestPath(originValve, valveDestination, valves).get(0).path;
+                    bestPaths.put(originValve + "-" + valveDestination, best);
+                    if(!bestPaths.containsKey(valveDestination + "-" + originValve)) {
+                        List<String> reversedBest = new ArrayList<>(best);
+                        Collections.reverse(reversedBest);
+                        bestPaths.put(valveDestination + "-" + originValve, reversedBest);
                     }
                 }
             }
@@ -60,10 +59,15 @@ public class Day16 {
         return bestPaths;
     }
 
+    private static void releasePressure(Map<String, Valve> valves) {
+        
+        for(String valveName : valves.keySet()) {
+            valves.get(valveName).releasePressure();
+        }
+    }
+
     private static List<Path> findBestPath(String origin, String destination, Map<String, Valve> valves) {
 
-        var valvesSet = valves.keySet();
-        //valvesSet.remove(origin);
         List<Path> paths = new ArrayList<>();
         paths.add(new Path(origin,0, Arrays.asList(origin)));
         boolean reached = false;
@@ -90,7 +94,6 @@ public class Day16 {
                 Collections.sort(paths);
             }
         }
-
         return paths;
     }
 }
