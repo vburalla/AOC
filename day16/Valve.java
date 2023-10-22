@@ -29,6 +29,10 @@ public class Valve implements Comparable<Valve>{
         if(open) this.releasedPressure += flowRate;
     }
 
+    public boolean isBroken() {
+        return this.flowRate < 1;
+    }
+
     @Override
     public int compareTo(Valve o) {
        

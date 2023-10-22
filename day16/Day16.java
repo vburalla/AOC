@@ -8,7 +8,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 
+import static day16.Combination.getAllCombinations;
+
 public class Day16 {
+
+    private static final int MINUTES = 30;
+    private static final String START_VALVE = "AA";
     
     public static void main(String[] args) {
 
@@ -26,24 +31,22 @@ public class Day16 {
 
     private static void moveReleasingPressure(Map<String, Valve> valves) {
 
-        int minutes = 30;
-        String currentValve = "AA";
-        while(minutes > 0) {
-            var valvePaths = createPathMap(currentValve, valves);
-            var bestValvePath = valvePaths.get(0);
-            List<String> destinationPath = bestValvePath.path;
-            destinationPath.remove(0);
-            for(String valve : destinationPath) {
-                releasePressure(valves);
-                if(valve.equals(bestValvePath.currentNode)){
-                    valves.get(valve).openValve();
-                    currentValve = valve;
-                    break;
-                }
-                minutes--;
-                System.out.println(String.format("Remaining %s", minutes));
+        var completePathMapCost = createCompletePathMap(valves,START_VALVE);
+        var notBrokenValves = getNotBrokenValvesList(valves);
+        List<String> allPossiblePaths = getAllPossiblePaths(notBrokenValves, START_VALVE);
+
+        int max = 0;
+        String maxPath = "";
+        for(String path : allPossiblePaths) {
+
+            int releasedPressure = calculateMaxReleasedPression(path, completePathMapCost, valves, MINUTES);
+            if(releasedPressure > max) {
+                max = releasedPressure;
+                maxPath = path;
             }
         }
+        System.out.println(String.format("Part 1: Released %s pressure following path %s",max, maxPath));
+
     }
 
     private static Valve createValveFromTextLine(String valveData) {
@@ -61,30 +64,30 @@ public class Day16 {
         return valve;
     }
 
-    private static List<Path> createPathMap(String originValve, Map<String, Valve> valves) {
+    private static Map<String, Integer> createCompletePathMap(Map<String, Valve> valves, String originValve) {
 
-        //Map<String, List<String>> bestPaths = new HashMap<>();
-        List<Path> bPaths = new ArrayList();
-        
-        for(String valveDestination : valves.keySet()) {
-            if(!valveDestination.equals(originValve) && !valves.get(valveDestination).open) {
-                //if(!bestPaths.containsKey(originValve + "-" + valveDestination)) {
-                    //var best = findBestPath(originValve, valveDestination, valves).get(0).path;
-                    var bPath = findBestPath(originValve, valveDestination, valves).get(0);
-                    //bestPaths.put(originValve + "-" + valveDestination, best);
-                    bPaths.add(bPath);
-                //}
+        Map<String, Integer> bestPaths = new HashMap<>();
+        var notBrokenValves = getNotBrokenValvesList(valves);
+        notBrokenValves.add(originValve);
+        for(String valveOrigin : notBrokenValves) {
+            for(String valveDestination : notBrokenValves) {
+                if (!valveDestination.equals(valveOrigin)) {
+                    if(!bestPaths.containsKey(valveOrigin + "-" + valveDestination)) {
+                        var best = findBestPath(valveOrigin, valveDestination, valves).get(0);
+                        bestPaths.put(valveOrigin + "-" + valveDestination, best.cost);
+                        if(!bestPaths.containsKey(valveDestination + "-" + valveOrigin)) {
+                            bestPaths.put(valveDestination + "-" + valveOrigin, best.cost);
+                        }
+                    }
+                }
             }
         }
-        Collections.sort(bPaths);
-        return bPaths;
+        return bestPaths;
     }
 
-    private static void releasePressure(Map<String, Valve> valves) {
-        
-        for(String valveName : valves.keySet()) {
-            valves.get(valveName).releasePressure();
-        }
+    private static List<String> getNotBrokenValvesList(Map<String, Valve> vMap) {
+
+        return vMap.keySet().stream().filter(key -> !vMap.get(key).isBroken()).collect(Collectors.toList());
     }
 
     private static List<Path> findBestPath(String origin, String destination, Map<String, Valve> valves) {
@@ -102,7 +105,7 @@ public class Day16 {
                         Path newPath = new Path(neighbour, path);
                         if (neighbour.equals(destination)) {
                             reached = true;
-                            newPath.reach(valves.get(destination).flowRate);
+                            newPath.reach();
                         }
                         newPaths.add(newPath);
                     }
@@ -117,4 +120,25 @@ public class Day16 {
         }
         return paths;
     }
+
+    private static List<String> getAllPossiblePaths(List<String> nodes, String startNode) {
+
+        return getAllCombinations(nodes, startNode);
+    }
+
+    private static int calculateMaxReleasedPression(String followedPath, Map<String, Integer> costs, Map<String, Valve> valves, int time) {
+
+        String[] visitedNodes = followedPath.split("-");
+        int released = 0;
+        for(int i=1; i < visitedNodes.length; i++) {
+            String route = visitedNodes[i-1] + "-" + visitedNodes[i];
+            int cost = costs.get(route);
+            time -= cost + 1;
+            released += ( time ) * valves.get(visitedNodes[i]).flowRate;
+
+        }
+        return released;
+
+    }
+
 }

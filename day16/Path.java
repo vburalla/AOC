@@ -1,6 +1,7 @@
 package day16;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Path implements Comparable<Path>{
@@ -9,14 +10,19 @@ public class Path implements Comparable<Path>{
     int cost;
     List<String> path;
     boolean reached;
-    double costCoefficient;
 
     public Path(String currrentNode, int cost, List<String> path) {
         this.currentNode = currrentNode;
         this.cost = cost;
         this.path = path;
         this.reached = false;
-        this.costCoefficient = 0;
+    }
+
+    public Path(String currrentNode, int cost, List<String> path, boolean reached) {
+        this.currentNode = currrentNode;
+        this.cost = cost;
+        this.path = path;
+        this.reached = reached;
     }
 
     public Path(String currentNode, Path previousPath) {
@@ -25,12 +31,10 @@ public class Path implements Comparable<Path>{
         this.path =new ArrayList<>(previousPath.path);
         this.path.add(currentNode);
         this.reached = false;
-        this.costCoefficient = 0;
     }
 
-    public void reach(int destinationFlowRate) {
+    public void reach() {
         this.reached = true;
-        this.costCoefficient = (cost!=0)? destinationFlowRate/cost : 0;
     }
 
     public boolean isReached() {
@@ -43,10 +47,17 @@ public class Path implements Comparable<Path>{
         if(o == null) {
             result = 1;
         } else {
-            if(this.costCoefficient != o.costCoefficient) {
-                result = this.costCoefficient > o.costCoefficient? -1 : 1;
+            if(this.cost != o.cost) {
+                result = this.cost < o.cost? -1 : 1;
             }
         }
         return result;
+    }
+
+    public Path getOppositePath() {
+        String reversedCurrentPath  = path.get(0);
+        List<String> reversedPath = new ArrayList<>(this.path);
+        Collections.reverse(reversedPath);
+        return new Path(reversedCurrentPath, cost, reversedPath, true);
     }
 }
