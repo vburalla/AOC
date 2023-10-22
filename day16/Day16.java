@@ -17,7 +17,7 @@ public class Day16 {
     
     public static void main(String[] args) {
 
-        var valvesMap = getValvesInfo(ReadFiles.getInputData("day16/test.txt"));
+        var valvesMap = getValvesInfo(ReadFiles.getInputData("day16/input1.txt"));
         moveReleasingPressure(valvesMap);
         System.out.println();
     }
