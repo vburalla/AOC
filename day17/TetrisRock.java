@@ -7,7 +7,7 @@ import java.util.List;
 
 public class TetrisRock {
 
-    private static final String EMPTY_ROW = ".......";
+    public static final String EMPTY_ROW = ".......";
 
     public static Deque<List<String>> getPiecesQueue() {
 
@@ -68,13 +68,5 @@ public class TetrisRock {
         return chamber;
     }
 
-    public static int getTopRockPosition(List<String> chamber) {
-
-        int rowNumber = chamber.size()-1;
-
-        while(rowNumber >= 0 && !chamber.get(rowNumber).contains("#")) {
-            rowNumber--;
-        }
-        return rowNumber;
-    }
+    
 }
