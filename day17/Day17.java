@@ -1,219 +1,162 @@
 package day17;
 
-import utils.Console;
 import utils.ReadFiles;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Day17 {
 
-    private static final char FIXED_PIECE_CHAR = '#';
-    private static final char CURRENT_PIECE_CHAR = '@';
-    private static final char EMPTY_POSITION_CHAR = '.';
-    private static final char LEFT_MOVING_CHAR = '<';
-    private static final char RIGHT_MOVING_CHAR = '>';
-    private static final int CHAMBER_COLUMNS = 7;
-
-    private static Deque<Character> instructions;
-    private static Deque<List<String>> pieces;
-    private static List<String> chamber;
-
+    private static List<Integer> chamber;
+    private static CircularList<List<Integer>> piecesQueue;
+    private static CircularList<Character> windDirections;
+    private static final Character DOWN_MOVEMENT_CHAR = 'd';
+    private static final int PART1_ROCKS_NUMBER = 2022;
+    private static LinkedList<CycleInfo> cycleInfoList;
+    private static List<String> cycleHash;
+    private static final int MIN_CYCLE_WINDOW = 64;
+    private static int cycleDelta;
+    private static int cycleSize;
+    private static long SECOND_PART_PIECES_NUMBER = 1000000000000L;
 
     public static void main(String[] args) {
-
-        String instructionText = ReadFiles.getInputData("day17/test.txt").get(0);
-        instructions = instructionText.chars().mapToObj(ch -> Character.valueOf((char) ch)).collect(Collectors.toCollection(ArrayDeque::new));
-        pieces = TetrisRock.getPiecesQueue();
-        chamber = TetrisRock.getChamber();
+        cycleInfoList = new LinkedList<>();
+        cycleHash = new ArrayList<>();
+        chamber = TetrisResources.getEmptyChamber();
+        piecesQueue = TetrisResources.getPiecesQueue();
+        String instructionText = ReadFiles.getInputData("day17/input1.txt").get(0);
+        windDirections = new CircularList<>();
+        windDirections.addAll(instructionText.chars().mapToObj(ch -> Character.valueOf((char) ch)).collect(Collectors.toCollection(CircularList::new)));
         throwPieces();
     }
 
     private static void throwPieces() {
 
+        int pieceNumber = 0;
+        int freeRows = 0;
         boolean fixed;
-        int instruction = 0;
+        boolean part1 = false;
+        boolean part2 = false;
+        int previousRowPosition = 0;
+        int currentTopRowPosition = 0;
 
-        while (instruction < 2023) {
-            int freeRows = chamber.size() - getTopRockPosition();
-            if (freeRows != 3) addEmptyRows(3 - freeRows);
-            var currentLowPieceRow = chamber.size();
-            var piece = pieces.pollFirst();
-            pieces.addLast(new ArrayList<>(piece));
-            chamber.addAll(piece);
-            //printChamber();
+        while (!part1 || !part2) {
+            if ((freeRows = chamber.size() - getTopRowPosition()) != TetrisResources.INITIAL_EMPTY_ROWS)
+                addEmptyRowsToChamber(TetrisResources.INITIAL_EMPTY_ROWS - freeRows);
+            var currentPiece = new ArrayList<>(piecesQueue.getFirstAndRotate());
+            var originalCurrentPiece = currentPiece.get(0);
             fixed = false;
-            while (!fixed) {
-                char ch = instructions.pollFirst();
-                instructions.addLast(ch);
-                if (!isBlockedBySides(ch, currentLowPieceRow, piece) && !isBlockedByPieces(ch, currentLowPieceRow, piece)) {
-                    if (ch == LEFT_MOVING_CHAR) {
-                        moveLeft(currentLowPieceRow, piece);
-                    } else {
-                        moveRight(currentLowPieceRow, piece);
-                    }
-                    //printChamber();
+            addEmptyRowsToChamber(currentPiece.size());
+            var currentRow = chamber.size()-currentPiece.size();
+            while(!fixed) {
+                Character ch = windDirections.getFirstAndRotate();
+                if (canMove(ch, currentRow, currentPiece)) {
+                    move(ch, currentRow, currentPiece);
                 }
-                if (canMoveDown(currentLowPieceRow, piece)) {
-                    moveDown(currentLowPieceRow, piece);
-                    currentLowPieceRow--;
-                    //printChamber();
+                if (canMove(DOWN_MOVEMENT_CHAR, currentRow, currentPiece)) {
+                    currentRow--;
                 } else {
-                    fixPiece(currentLowPieceRow, piece);
                     fixed = true;
-                    //printChamber();
-                }
-                instruction++;
-            }
-        }
-        System.out.println(String.format("Part 1: tower is %s units tall", getTopRockPosition()+1));
-    }
-
-    private static boolean canMoveDown(int row, List<String> piece) {
-
-        boolean canMove;
-        if (row > 0) {
-            canMove = true;
-            for (int i = row; i < (row + piece.size()); i++) {
-                var lineChars = chamber.get(i).toCharArray();
-                for (int j = 0; j < CHAMBER_COLUMNS - 1; j++) {
-                    if (lineChars[j] == CURRENT_PIECE_CHAR && chamber.get(i - 1).charAt(j) == FIXED_PIECE_CHAR) {
-                        canMove = false;
-                        break;
+                    fixPiece(currentRow, currentPiece);
+                    previousRowPosition = currentTopRowPosition;
+                    currentTopRowPosition = getTopRowPosition();
+                    String hash = originalCurrentPiece.toString() + "#" + (currentTopRowPosition - previousRowPosition);
+                    cycleInfoList.add(new CycleInfo(hash, pieceNumber + 1, currentTopRowPosition, currentTopRowPosition - previousRowPosition));
+                    if(!part2) {
+                        cycleHash.add(hash);
+                        if (pieceNumber % 2000 == 0) {
+                            part2 = checkForCycle(cycleHash);
+                        }
                     }
                 }
-                if (!canMove) break;
             }
-        } else {
-            canMove = false;
+            pieceNumber++;
+            if(pieceNumber == PART1_ROCKS_NUMBER) {
+                System.out.println(String.format("Part 1: tower tall after %d is %d", PART1_ROCKS_NUMBER, cycleInfoList.get(cycleInfoList.size()-1).pileTall));
+                part1 = true;
+            }
         }
-        return canMove;
     }
 
-    private static boolean isBlockedBySides(char direction, int row, List<String> piece) {
+    private static int getTopRowPosition() {
+        int rowNumber = chamber.size() - 1;
+        while (rowNumber > 0 && chamber.get(rowNumber).equals(TetrisResources.EMPTY_ROW_VALUE))
+            rowNumber--;
 
-        var positionToCheck = (direction == LEFT_MOVING_CHAR) ? 0 : CHAMBER_COLUMNS - 1;
-        boolean isBlocked = false;
+        return !chamber.get(rowNumber).equals(TetrisResources.EMPTY_ROW_VALUE) ? rowNumber + 1 : rowNumber;
+    }
 
-        for (int i = row; i < row + piece.size(); i++) {
-            var currentRow = chamber.get(i);
-            if (currentRow.charAt(positionToCheck) == CURRENT_PIECE_CHAR) {
+    private static void addEmptyRowsToChamber(int rowsToAdd) {
+
+        for (int i = 0; i < Math.abs(rowsToAdd); i++) {
+            if (rowsToAdd > 0) {
+                chamber.add(TetrisResources.EMPTY_ROW_VALUE);
+            } else if (rowsToAdd < 0) {
+                chamber.remove(chamber.size() - 1);
+            }
+        }
+    }
+
+    private static boolean canMove(Character direction, int currentRow, List<Integer> piece) {
+
+        var vMovement = direction.equals('d')? -1 : 0;
+        if(currentRow > 0 || (currentRow == 0 && !direction.equals('d'))) {
+            for (int i = 0; i < piece.size(); i++) {
+                int movedPieceRow = piece.get(i);
+                if(!direction.equals('d')) {
+                    movedPieceRow = direction.equals('<') ? movedPieceRow << 1 : movedPieceRow >> 1;
+                }
+                int chamberRow = chamber.get(i + currentRow + vMovement);
+                if ((chamberRow & movedPieceRow) > 0)
+                    return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static void move(Character direction, int currentRow, List<Integer> piece) {
+
+        for(int i = 0; i < piece.size(); i++) {
+            int movedPieceRow = piece.get(i);
+            if(!direction.equals('d')) {
+                movedPieceRow = direction.equals('<') ? movedPieceRow << 1 : movedPieceRow >> 1;
+            }
+            piece.set(i, movedPieceRow);
+        }
+    }
+
+    private static boolean checkForCycle(List<String> hashes) {
+        int i = 0;
+        int index = 0;
+        while(i < hashes.size() - MIN_CYCLE_WINDOW) {
+
+            List<String> sublist1 = hashes.subList(i, i + MIN_CYCLE_WINDOW);
+            List<String> sublist2 = hashes.subList(i + MIN_CYCLE_WINDOW, hashes.size());
+            if((index = Collections.indexOfSubList(sublist2, sublist1)) > 0) {
+                System.out.println(String.format("Start cycle delta at index = %d, size of cycle = %d", i, index + i + MIN_CYCLE_WINDOW));
+                cycleSize = index + MIN_CYCLE_WINDOW;
+                cycleDelta = i;
+
+                long deltaTall = cycleInfoList.get(cycleDelta).pileTall;
+                long cycleTall = cycleInfoList.get(cycleDelta + cycleSize).pileTall - deltaTall;
+                long rounds = (SECOND_PART_PIECES_NUMBER - cycleDelta) / cycleSize;
+                long additionalPieces = (SECOND_PART_PIECES_NUMBER - cycleDelta) % cycleSize;
+                long finalTall = deltaTall + rounds * cycleTall + cycleInfoList.get((int) (cycleDelta + additionalPieces-1)).pileTall - cycleInfoList.get(cycleDelta).pileTall;
+                System.out.println(String.format("Part 2: Tower tall after %d pieces: %d", SECOND_PART_PIECES_NUMBER, finalTall));
                 return true;
             }
+            i++;
         }
-        return isBlocked;
+        return false;
     }
 
-    private static boolean isBlockedByPieces(char direction, int row, List<String> piece) {
-
-        boolean isBlocked = false;
-        for (int i = row; i < (row + piece.size()); i++) {
-            var currentRow = chamber.get(row).toCharArray();
-            if (direction == LEFT_MOVING_CHAR) {
-                for (int j = CHAMBER_COLUMNS - 1; j > 0; j--) {
-                    if (currentRow[j] == CURRENT_PIECE_CHAR && currentRow[j - 1] == FIXED_PIECE_CHAR) return true;
-                }
-            } else {
-                for (int j = 0; j < CHAMBER_COLUMNS - 1; j++) {
-                    if (currentRow[j] == CURRENT_PIECE_CHAR && currentRow[j + 1] == FIXED_PIECE_CHAR) return true;
-                }
-            }
-        }
-        return isBlocked;
-    }
-
-    private static int getTopRockPosition() {
-
-        int rowNumber = chamber.size()-1;
-
-        while (rowNumber > 0 && !chamber.get(rowNumber).contains("#")) {
-            rowNumber--;
-        }
-        return chamber.get(rowNumber).contains("#")? rowNumber+1 : rowNumber;
-    }
-
-    private static void addEmptyRows(int n) {
-        if(n > 0) {
-            for (int i = 0; i < n; i++) {
-                chamber.add(TetrisRock.EMPTY_ROW);
-            }
-        } else if(n < 0) {
-            for (int i = 0; i < Math.abs(n); i++) {
-                chamber.remove(chamber.size()-1-i);
-            }
+    private static void fixPiece(int currentPieceRow, List<Integer> piece) {
+        for(int i = 0; i < piece.size(); i++) {
+            int pieceRow = piece.get(i);
+            chamber.set(currentPieceRow + i, chamber.get(currentPieceRow + i) | pieceRow);
         }
     }
 
-    private static void printChamber() {
-        Console.clearScreen();
-        for (int i = chamber.size() - 1; i >= 0; i--) {
-            System.out.println(chamber.get(i));
-        }
-        System.out.println();
-        try {
-            Thread.sleep(200);
-        } catch (Exception ex) {
-
-        }
-    }
-
-    private static void moveLeft(int row, List<String> piece) {
-
-        for (int i = row; i < (row + piece.size()); i++) {
-
-            var existingRow = chamber.get(i).toCharArray();
-
-            for (int j = 1; j < (CHAMBER_COLUMNS); j++) {
-                if (existingRow[j] == CURRENT_PIECE_CHAR) {
-                    existingRow[j - 1] = CURRENT_PIECE_CHAR;
-                    existingRow[j] = EMPTY_POSITION_CHAR;
-                }
-            }
-            chamber.set(i, new String(existingRow));
-        }
-    }
-
-    private static void moveRight(int row, List<String> piece) {
-
-        for (int i = row; i < (row + piece.size()); i++) {
-
-            var existingRow = chamber.get(i).toCharArray();
-
-            for (int j = CHAMBER_COLUMNS - 1; j >= 0; j--) {
-                if (existingRow[j] == CURRENT_PIECE_CHAR) {
-                    existingRow[j + 1] = CURRENT_PIECE_CHAR;
-                    existingRow[j] = EMPTY_POSITION_CHAR;
-                }
-            }
-            chamber.set(i, new String(existingRow));
-        }
-    }
-
-    private static void moveDown(int row, List<String> piece) {
-
-        for (int i = row; i < (row + piece.size()); i++) {
-
-            var existingRow = chamber.get(i).toCharArray();
-            var lowRow = chamber.get(i - 1).toCharArray();
-            for (int j = 0; j < CHAMBER_COLUMNS; j++) {
-                if (existingRow[j] == CURRENT_PIECE_CHAR) {
-                    lowRow[j] = CURRENT_PIECE_CHAR;
-                    existingRow[j] = EMPTY_POSITION_CHAR;
-                }
-            }
-            chamber.set(i, new String(existingRow));
-            chamber.set(i - 1, new String(lowRow));
-        }
-    }
-
-    private static void fixPiece(int row, List<String> piece) {
-
-        for (int i = row; i < (row + piece.size()); i++) {
-            String currentRow = chamber.set(i, chamber.get(i).replace(CURRENT_PIECE_CHAR, FIXED_PIECE_CHAR));
-        }
-    }
 }
- 
