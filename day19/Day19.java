@@ -15,7 +15,9 @@ public class Day19 {
 
         var lines = ReadFiles.getInputData("day19/test.txt");
         readBluePrints(lines);
-        System.out.println();
+        List<Robot> currentRobots = new ArrayList<>();
+
+
     }
 
     private static void readBluePrints(List<String> textLines) {

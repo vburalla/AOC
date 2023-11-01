@@ -1,25 +1,35 @@
 package day19;
 
-public class Robot {
-    String product;
-    Integer oreCost;
-    Integer clayCost;
-    Integer obsidianCost;
-
-    public Robot(String type, Integer oreCost, Integer clayCost, Integer obsidianCost) {
-
-        this.product = type;
-        this.oreCost = oreCost;
-        this.clayCost = clayCost;
-        this.obsidianCost = obsidianCost;
-    }
+public class Robot implements Comparable<Robot>{
+    String type;
+    Resource produces;
+    Resource costs;
+    boolean inConstruction;
 
     public Robot(String type) {
 
-        this.product = type;
-        this.oreCost = 0;
-        this.clayCost = 0;
-        this.obsidianCost = 0;
+        this.produces = new Resource();
+        this.costs = new Resource();
+        this.inConstruction = true;
+        this.type = type;
+        switch (type) {
+            case "ore":
+                this.produces.ore = 1;
+                break;
+            case "clay":
+                this.produces.clay = 1;
+                break;
+            case "obsidian":
+                this.produces.obsidian = 1;
+                break;
+            case "geode":
+                this.produces.geode = 1;
+                break;
+        }
+    }
+
+    public String getType() {
+        return this.type;
     }
 
     public void addCost(String cost) {
@@ -28,14 +38,41 @@ public class Robot {
 
         switch (costInfo[1]) {
             case "ore":
-                this.oreCost = Integer.valueOf(costInfo[0]);
+                this.costs.ore = Integer.valueOf(costInfo[0]);
                 break;
             case "clay":
-                this.clayCost = Integer.valueOf(costInfo[0]);
+                this.costs.clay = Integer.valueOf(costInfo[0]);
                 break;
             case "obsidian":
-                this.obsidianCost = Integer.valueOf(costInfo[0]);
+                this.costs.obsidian = Integer.valueOf(costInfo[0]);
                 break;
         }
     }
+
+    public Resource collect() {
+
+        Resource resource = new Resource();
+        if(this.inConstruction) {
+            this.inConstruction = false;
+        } else {
+            resource = this.produces;
+        }
+        return resource;
+    }
+
+    public boolean canBuild(Resource resource) {
+        return resource.ore >= this.costs.ore && resource.clay >= this.costs.clay
+                && resource.geode >= this.costs.geode && resource.obsidian >= this.costs.obsidian;
+    }
+
+    @Override
+    public int compareTo(Robot o) {
+        if(o == null) {
+            return 1;
+        } else {
+            Robot oR = (Robot) o;
+            return this.produces.compareTo(oR.produces);
+        }
+    }
+
 }
