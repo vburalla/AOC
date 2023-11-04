@@ -68,11 +68,21 @@ public class Robot implements Comparable<Robot>{
     @Override
     public int compareTo(Robot o) {
         if(o == null) {
-            return 1;
+            return -1;
         } else {
             Robot oR = (Robot) o;
             return this.produces.compareTo(oR.produces);
         }
+    }
+
+    public Robot copy(boolean isInConstruction) {
+        Robot robot = new Robot(this.type);
+        robot.costs.clay = this.costs.clay;
+        robot.costs.ore = this.costs.ore;
+        robot.costs.obsidian = this.costs.obsidian;
+        robot.costs.geode = this.costs.geode;
+        robot.inConstruction = isInConstruction;
+        return robot;
     }
 
 }

@@ -20,4 +20,5 @@ public class BluePrint {
         Optional<Robot> robot = robots.stream().filter(r -> r.getType().equals(type)).findFirst();
         return robot.orElse(null);
     }
+
 }

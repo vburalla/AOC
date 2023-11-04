@@ -20,10 +20,27 @@ public class Resource implements Comparable<Resource>{
         this.geode += resource.geode;
     }
 
+    public void spendResources(Resource resource) {
+        this.ore -= resource.ore;
+        this.obsidian -= resource.obsidian;
+        this.clay -= resource.clay;
+        this.geode -= resource.geode;
+    }
+
+    public Resource copy() {
+
+        Resource resource = new Resource();
+        resource.geode = this.geode;
+        resource.ore = this.ore;
+        resource.clay = this.clay;
+        resource.obsidian = this.obsidian;
+        return resource;
+    }
+
     @Override
     public int compareTo(Resource o) {
         if(o == null) {
-            return 1;
+            return -1;
         } else {
             Resource rO = (Resource) o;
             int value1 = this.ore + 10 * this.clay + 100 * this.obsidian + 1000 * this.geode;
@@ -31,7 +48,7 @@ public class Resource implements Comparable<Resource>{
             if(value1 == value2) {
                 return 0;
             } else {
-                return value1 > value2 ? 1 : -1;
+                return value1 > value2 ? -1 : 1;
             }
         }
     }
