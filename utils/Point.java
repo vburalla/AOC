@@ -54,4 +54,13 @@ public class Point {
     public Point clone() {
         return new Point(x,y);
     }
+
+    public Point add(Point point) {
+        return new Point(this.x + point.x, this.y + point.y);
+    }
+
+    public String toString() {
+        return "x = " + this.x + ", y = " + this.y;
+    }
+
 }
