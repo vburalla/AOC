@@ -64,7 +64,8 @@ public class Day22 {
             }
             i++;
         }
-        System.out.println(String.format("x = %d, y = %d", position.getX()+1, position.getY()+1));
+        System.out.printf("x = %d, y = %d%n", position.getX()+1, position.getY()+1);
+        System.out.printf("Part 1: %d%n", 1000 * (position.getY() + 1) + 4 * (position.getX() + 1) + directions.getCurrentIndex());
     }
 
     private static Point rotate(String direction, Point currentDirection) {
@@ -76,8 +77,8 @@ public class Day22 {
 
         directions.add(new Point(1,0));
         directions.add(new Point(0,1));
-        directions.add(new Point(-1, 0));
-        directions.add(new Point(0, -1));
+        directions.add(new Point(-1,0));
+        directions.add(new Point(0,-1));
     }
 
     private static List<String> getInstructionsList(String instructions) {

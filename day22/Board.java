@@ -70,8 +70,11 @@ public class Board {
     private int getMirrorRow(Point point, int direction) {
 
         int i = 0;
+        int rowLimit = leftLimit.size();
 
-        while((leftLimit.get(point.getY() - (direction * i)) <= point.getX()) && (rightLimit.get(point.getY()) - (direction * i)) >= point.getX()) {
+        while((point.getY() - (direction * i)) < rowLimit
+                && (leftLimit.get(point.getY() - (direction * i)) <= point.getX())
+                && (rightLimit.get(point.getY()) - (direction * i)) >= point.getX()) {
             i++;
         }
         i--;

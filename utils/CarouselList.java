@@ -22,4 +22,8 @@ public class CarouselList<T> extends LinkedList<T> {
         if(currentIndex < 0) currentIndex = this.size()-1;
         return this.get(currentIndex);
     }
+
+    public int getCurrentIndex() {
+        return this.currentIndex;
+    }
 }
