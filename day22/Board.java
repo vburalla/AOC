@@ -30,8 +30,8 @@ public class Board {
                 boardLines.set(i, line);
             }
             this.boardMatrix[i] = line.toCharArray();
-            this.leftLimit.add(line.indexOf(VALID_POSITION));
-            this.rightLimit.add(line.lastIndexOf(VALID_POSITION));
+            this.leftLimit.add(getLeftLimit(boardMatrix[i]));
+            this.rightLimit.add(getRightLimit(boardMatrix[i]));
             i++;
         }
     }
@@ -70,15 +70,22 @@ public class Board {
     private int getMirrorRow(Point point, int direction) {
 
         int i = 0;
+        int curentRow = point.getY();
         int rowLimit = leftLimit.size();
 
-        while((point.getY() - (direction * i)) < rowLimit
-                && (leftLimit.get(point.getY() - (direction * i)) <= point.getX())
-                && (rightLimit.get(point.getY()) - (direction * i)) >= point.getX()) {
+        while( curentRow < rowLimit && curentRow >= 0
+                && (leftLimit.get(curentRow) <= point.getX())
+                && (rightLimit.get(curentRow) >= point.getX())) {
             i++;
+            curentRow = point.getY() - (direction * i);
         }
-        i--;
-        return boardMatrix[point.getY() - (direction * i)][point.getX()] != WALL_POSITION? point.getY() - (direction * i) : point.getY();
+
+        if(curentRow > 0) {
+            curentRow = curentRow + direction;
+        } else {
+            curentRow = 0;
+        }
+        return boardMatrix[curentRow][point.getX()] != WALL_POSITION? curentRow : point.getY();
 
     }
 
@@ -88,5 +95,25 @@ public class Board {
 
         return boardMatrix[point.getY()][col] == WALL_POSITION? point.getX() : col;
 
+    }
+
+    private int getLeftLimit(char[] chars ) {
+
+        int i=0;
+
+        while(chars[i] == OUTSIDE_POSITION) {
+            i++;
+        }
+        return i;
+    }
+
+    private int getRightLimit(char[] chars ) {
+
+        int i=chars.length - 1;
+
+        while(chars[i] == OUTSIDE_POSITION) {
+            i--;
+        }
+        return i;
     }
 }

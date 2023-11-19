@@ -15,14 +15,14 @@ public class Day22 {
 
     public static void main(String[] args) {
 
-        List<String> lines = ReadFiles.getInputData("day22/test.txt");
+        List<String> lines = ReadFiles.getInputData("day22/input1.txt");
         createDirections();
         int maxLength = 0;
         int instructionsLine = 0;
         String instructions = "";
         while (instructionsLine < lines.size()) {
             var line = lines.get(instructionsLine);
-            if (!line.equals("")) {
+            if (!line.isEmpty()) {
                 if (line.length() > maxLength) maxLength = line.length();
                 instructionsLine++;
             } else {
@@ -55,9 +55,10 @@ public class Day22 {
                     } else {
                         position = newPos;
                     }
-                    System.out.println(position);
+                    //System.out.println(position);
                     step++;
                 }
+                System.out.println(String.format("Stop at x=%d y=%d", position.getX(), position.getY()));
 
             } else {
                 direction = rotate(instruction, direction);
